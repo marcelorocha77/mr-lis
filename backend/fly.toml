@@ -1,0 +1,35 @@
+# Fly.io app config — MR LIS backend
+# Rode: fly launch --copy-config --no-deploy  (o --no-deploy evita subir antes de configurar secrets)
+app = "mr-lis-api"
+primary_region = "gru"  # São Paulo
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  # DATABASE_URL, SECRET_KEY, CORS_ORIGINS via `fly secrets set`
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"      # dorme quando ocioso (economiza recurso free)
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+  size = "shared-cpu-1x"
+
+[processes]
+  app = "python -m app.scripts.deploy_start"

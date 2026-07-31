@@ -1,0 +1,23 @@
+# Render.com Blueprint — MR LIS
+# Grátis: 750h/mês free web service, sleep após 15 min de inatividade.
+# Precisa: repo GitHub conectado.
+
+services:
+  - type: web
+    name: mr-lis-api
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false  # setar manualmente no painel (segredo)
+      - key: SECRET_KEY
+        generateValue: true  # Render gera valor aleatorio na 1a vez
+      - key: CORS_ORIGINS
+        sync: false  # setar depois com a URL do Vercel
