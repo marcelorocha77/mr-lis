@@ -29,10 +29,13 @@ class Settings(BaseSettings):
         if url.startswith("postgresql://"):
             url = "postgresql+asyncpg://" + url[len("postgresql://"):]
 
-        if "sslmode=" in url:
+        # Neon manda sslmode= e channel_binding= no URL, ambos são libpq-only.
+        # asyncpg negocia SSL/channel-binding via connect_args, então removemos daqui.
+        STRIP = {"sslmode", "channel_binding"}
+        if any(f"{k}=" in url for k in STRIP):
             from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
             p = urlsplit(url)
-            q = [(k, v) for k, v in parse_qsl(p.query) if k.lower() != "sslmode"]
+            q = [(k, v) for k, v in parse_qsl(p.query) if k.lower() not in STRIP]
             url = urlunsplit((p.scheme, p.netloc, p.path, urlencode(q), p.fragment))
         return url
 

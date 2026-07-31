@@ -11,8 +11,12 @@ _is_sqlite = _db_url.startswith("sqlite")
 if _is_sqlite:
     _connect_args = {"check_same_thread": False}
 else:
-    # asyncpg quer `ssl='require'` (não sslmode) quando o servidor exige SSL (Neon/Supabase/etc)
-    _connect_args = {"ssl": "require"} if settings.requires_ssl else {}
+    # asyncpg quer `ssl='require'` (não sslmode) quando o servidor exige SSL (Neon/Supabase/etc).
+    # statement_cache_size=0 é obrigatório quando conectando via pooler (Neon -pooler /
+    # Supabase Supavisor / PgBouncer em transaction mode).
+    _connect_args = {"statement_cache_size": 0}
+    if settings.requires_ssl:
+        _connect_args["ssl"] = "require"
 
 engine = create_async_engine(
     _db_url,
