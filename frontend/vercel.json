@@ -3,13 +3,5 @@
   "buildCommand": "next build",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "regions": ["gru1"],
-  "env": {
-    "BACKEND_URL": "@backend-url"
-  },
-  "build": {
-    "env": {
-      "BACKEND_URL": "@backend-url"
-    }
-  }
+  "regions": ["gru1"]
 }
